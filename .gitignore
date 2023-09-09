@@ -1,0 +1,11 @@
+
+/.idea
+/.DS_Store
+/cert
+/config
+/log
+config_dev.yaml
+config_dev2.yaml
+config_dev3.yaml
+/node_modules
+
