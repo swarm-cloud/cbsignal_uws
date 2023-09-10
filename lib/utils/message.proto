@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = "./;message";
+
+package message;
+
+message RpcResp {
+    bool success = 1;
+    string reason = 2;
+}
+
+message SignalReq {
+    string toPeerId = 1;
+    bytes data = 2;
+}
+
+message SignalBatchReq {
+    repeated SignalReq items = 1;
+}
+
+message Auth {
+    string token = 1;
+    string from = 2;
+}
+
+message Ping {
+    string from = 1;
+}
+
+message Pong {
+    int32 numClient = 1;
+}

@@ -21,7 +21,7 @@ let numCPUs = require("os").availableParallelism();
 if (numCPUs > 2) {
     numCPUs --;
 }
-numCPUs = 2;    // test
+numCPUs = 1;    // test
 
 const program = new Command();
 program
