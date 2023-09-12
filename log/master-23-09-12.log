@@ -1,0 +1,17 @@
+23-09-12 15:16:11 warn: master 10473 is running, numCPUs 1
+23-09-12 15:16:29 warn: master 10495 is running, numCPUs 2
+23-09-12 15:16:29 warn: worker 10496 died, fork another worker
+23-09-12 15:16:29 warn: worker 10497 died, fork another worker
+23-09-12 15:17:27 warn: master 10528 is running, numCPUs 2
+23-09-12 15:17:27 warn: worker 10529 died, fork another worker
+23-09-12 15:17:27 warn: worker 10530 died, fork another worker
+23-09-12 15:17:46 warn: master 10553 is running, numCPUs 2
+23-09-12 15:18:04 warn: master 10578 is running, numCPUs 2
+23-09-12 15:18:23 warn: master 10596 is running, numCPUs 2
+23-09-12 15:39:15 warn: master 10960 is running, numCPUs 2
+23-09-12 15:46:46 warn: master 11092 is running, numCPUs 2
+23-09-12 15:47:08 warn: master 11122 is running, numCPUs 2
+23-09-12 15:48:10 warn: master 11156 is running, numCPUs 2
+23-09-12 19:21:35 warn: master 15342 is running, numCPUs 7
+23-09-12 19:21:44 warn: master 15382 is running, numCPUs 7
+23-09-12 19:52:30 warn: master 15899 is running, numCPUs 7

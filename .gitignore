@@ -3,9 +3,8 @@
 /.DS_Store
 /cert
 /config
-/log
-config_dev.yaml
-config_dev2.yaml
-config_dev3.yaml
+/log/config_dev.yaml
+/log/config_dev2.yaml
+/log/config_dev3.yaml
 /node_modules
 lib/.DS_Store

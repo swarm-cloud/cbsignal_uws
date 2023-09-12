@@ -29,7 +29,7 @@ program
     .name('cbsignal_uws')
     .description('SwarmCloud signaling server using uWebSockets.js')
     .version(pkg.version, '-v, --version', 'output the current version')
-    .option('-c, --config [p]', 'The yaml file for config', 'config.yaml');
+    .option('-c, --config [p]', 'The yaml file for config', 'config/config.yaml');
 program.parse(process.argv);
 const options = program.opts();
 const configObject = YAML.load(options.config);

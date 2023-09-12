@@ -1,0 +1,68 @@
+10473 23-09-12 15:16:11 warn: Child PID: 10473 running
+10473 23-09-12 15:16:11 warn: 10473 is listening to http 80
+10473 23-09-12 15:16:18 warn: consume mq is empty!
+10473 23-09-12 15:16:25 warn: consume mq is empty!
+10496 23-09-12 15:16:29 warn: Child PID: 10496 running
+10496 23-09-12 15:16:29 warn: 10496 is listening to http 80
+10497 23-09-12 15:16:29 warn: Child PID: 10497 running
+10497 23-09-12 15:16:29 warn: 10497 is listening to http 80
+10530 23-09-12 15:17:27 warn: Child PID: 10530 running
+10530 23-09-12 15:17:27 warn: 10530 is listening to http 80
+10529 23-09-12 15:17:27 warn: Child PID: 10529 running
+10529 23-09-12 15:17:27 warn: 10529 is listening to http 80
+10555 23-09-12 15:17:46 warn: Child PID: 10555 running
+10555 23-09-12 15:17:46 warn: 10555 is listening to http 80
+10554 23-09-12 15:17:46 warn: Child PID: 10554 running
+10554 23-09-12 15:17:46 warn: 10554 is listening to http 80
+10554 23-09-12 15:17:46 warn: new Node 172.20.10.12-10555
+10554 23-09-12 15:17:46 warn: new Node 172.20.10.12-10555
+10579 23-09-12 15:18:04 warn: Child PID: 10579 running
+10579 23-09-12 15:18:04 warn: 10579 is listening to http 80
+10580 23-09-12 15:18:04 warn: Child PID: 10580 running
+10580 23-09-12 15:18:04 warn: 10580 is listening to http 80
+10579 23-09-12 15:18:11 warn: consume mq is empty!
+10580 23-09-12 15:18:11 warn: consume mq is empty!
+10601 23-09-12 15:18:23 warn: Child PID: 10601 running
+10601 23-09-12 15:18:23 warn: 10601 is listening to http 80
+10600 23-09-12 15:18:23 warn: Child PID: 10600 running
+10600 23-09-12 15:18:23 warn: 10600 is listening to http 80
+10601 23-09-12 15:18:30 warn: consume mq is empty!
+10600 23-09-12 15:18:30 warn: consume mq is empty!
+10601 23-09-12 15:18:37 warn: consume mq is empty!
+10600 23-09-12 15:18:37 warn: consume mq is empty!
+10600 23-09-12 15:18:44 warn: consume mq is empty!
+10601 23-09-12 15:18:44 warn: consume mq is empty!
+10600 23-09-12 15:18:51 warn: consume mq is empty!
+10601 23-09-12 15:18:51 warn: consume mq is empty!
+10601 23-09-12 15:18:58 warn: consume mq is empty!
+10600 23-09-12 15:18:58 warn: consume mq is empty!
+10601 23-09-12 15:19:05 warn: consume mq is empty!
+10600 23-09-12 15:19:05 warn: consume mq is empty!
+10601 23-09-12 15:19:12 warn: consume mq is empty!
+10600 23-09-12 15:19:12 warn: consume mq is empty!
+10961 23-09-12 15:39:15 warn: Child PID: 10961 running
+10961 23-09-12 15:39:15 warn: 10961 is listening to http 80
+10962 23-09-12 15:39:15 warn: Child PID: 10962 running
+10962 23-09-12 15:39:15 warn: 10962 is listening to http 80
+11094 23-09-12 15:46:46 warn: Child PID: 11094 running
+11094 23-09-12 15:46:46 warn: 11094 is listening to http 80
+11093 23-09-12 15:46:46 warn: Child PID: 11093 running
+11093 23-09-12 15:46:46 warn: 11093 is listening to http 80
+11123 23-09-12 15:47:08 warn: Child PID: 11123 running
+11123 23-09-12 15:47:08 warn: 11123 is listening to http undefined
+11124 23-09-12 15:47:08 warn: Child PID: 11124 running
+11124 23-09-12 15:47:08 warn: 11124 is listening to http undefined
+11158 23-09-12 15:48:10 warn: Child PID: 11158 running
+11158 23-09-12 15:48:10 warn: 11158 is listening to http 90
+11157 23-09-12 15:48:10 warn: Child PID: 11157 running
+11157 23-09-12 15:48:10 warn: 11157 is listening to http 90
+11157 23-09-12 15:48:17 warn: consume mq is empty!
+11158 23-09-12 15:48:17 warn: consume mq is empty!
+11157 23-09-12 15:48:24 warn: consume mq is empty!
+11158 23-09-12 15:48:24 warn: consume mq is empty!
+15342 23-09-12 19:21:35 warn: Child PID: 15342 running
+15342 23-09-12 19:21:35 warn: 15342 is listening to http 80
+15382 23-09-12 19:21:44 warn: Child PID: 15382 running
+15382 23-09-12 19:21:44 warn: 15382 is listening to http 801
+15899 23-09-12 19:52:30 warn: Child PID: 15899 running
+15899 23-09-12 19:52:30 warn: 15899 is listening to http 80
