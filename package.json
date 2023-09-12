@@ -4,8 +4,8 @@
   "description": "SwarmCloud signaling server using uWebSockets.js",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js -c config/config_dev.yaml",
-    "start2": "node index.js -c config/config_dev2.yaml",
+    "start": "node index.js",
+    "start_dev": "WORKERS=1 node index.js -c config/config_dev.yaml & WORKERS=1 node index.js -c config/config_dev2.yaml & WORKERS=1 node index.js -c config/config_dev3.yaml",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

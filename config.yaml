@@ -1,0 +1,43 @@
+
+log:
+  writers: stdout              # 输出位置，有两个可选项 —— file 和 stdout。选择 file 会将日志记录到 logger_file 指定的日志文件中，选择 stdout 会将日志输出到标准输出，当然也可以两者同时选择
+  logger_level: WARN           # 日志级别，DEBUG、INFO、WARN、ERROR、FATAL
+  logger_dir: log              # 日志文件目录
+  log_rotate_date: 1           # rotate 转存时间
+  log_rotate_size: 1           # rotate 转存大小
+
+port:
+  - 80
+
+#tls:
+#  - port: 443
+#    cert: fullchain.cer
+#    key: cdnbye.com.key
+
+#redis:
+#  host: 127.0.0.1
+#  port: 6379
+#  dbname: 0
+#  is_cluster: false
+#  cluster:
+#    - host: 127.0.0.1
+#      port: 6379
+#    - host: 127.0.0.1
+#      port: 6380
+
+ratelimit:
+  enable: false
+  max_rate: 400                # max requests per second
+
+stats:
+  enable: true
+#  token: 123456           # Custom token for requesting stats info
+
+compression:
+  enable: false
+
+
+
+
+
+

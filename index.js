@@ -9,7 +9,6 @@ const logFormat = require("./lib/utils/log-format.js");
 const { createLogger, format, transports } = winston;
 const transportArr = [
     new transports.Console({
-        level: 'info',
         format: format.combine(
             format.colorize({ all: true }),
             ...logFormat.commonFormat,
@@ -21,7 +20,9 @@ let numCPUs = require("os").availableParallelism();
 if (numCPUs > 2) {
     numCPUs --;
 }
-numCPUs = 1;    // test
+if (process.env.WORKERS) {
+    numCPUs = Number(process.env.WORKERS);
+}
 
 const program = new Command();
 program
@@ -32,15 +33,16 @@ program
 program.parse(process.argv);
 const options = program.opts();
 const configObject = YAML.load(options.config);
+mergeENV(configObject);
 cluster.schedulingPolicy = cluster.SCHED_RR;
-
 if (configObject.log?.writers === 'file') {
+    const { logger_dir, log_rotate_size, log_rotate_date } = configObject.log;
     const transport = new winston.transports.DailyRotateFile({
-        filename: 'log/master-%DATE%.log',
+        filename: `${logger_dir}/master-%DATE%.log`,
         datePattern: 'YY-MM-DD',
         zippedArchive: true,
-        maxSize: '1m',
-        maxFiles: '14d',
+        maxSize: `${log_rotate_size}m`,
+        maxFiles: `${log_rotate_date}d`,
         createSymlink: true,
         symlinkName: 'master.log',
         format: format.combine(
@@ -55,8 +57,14 @@ const logger = createLogger({
     transports: transportArr,
 });
 
+if (cluster.isPrimary) {
+    masterProc();
+} else {
+    childProc()
+}
+
 function masterProc() {
-    logger.warn(`master ${process.pid} is running`);
+    logger.warn(`master ${process.pid} is running, numCPUs ${numCPUs}`);
     if (numCPUs <= 1 || !configObject.redis) {
         // if (true) {
         // do not start worker thread and use redis
@@ -64,12 +72,25 @@ function masterProc() {
     } else {
         for (let i = 0; i < numCPUs; i++) {
             logger.info(`forking process number ${i}...`);
-            cluster.fork();
+            setupWorker(cluster.fork());
         }
         cluster.on("exit", (worker, code, signal) => {
             logger.warn(`worker ${worker.process.pid} died, fork another worker`);
-            cluster.fork();
+            setTimeout(() => {
+                setupWorker(cluster.fork());
+            }, 5000)
         });
+        // cluster.on('online', () => {
+        //     logger.info(`Worker is online`)
+        //     const workers = Object.values(cluster.workers);
+        //     const workerPids = workers.map(worker => worker.process.pid);
+        //     for (const worker of workers) {
+        //         worker.send(JSON.stringify({
+        //             action: 'pids',
+        //             data: workerPids,
+        //         }));
+        //     }
+        // })
     }
 }
 
@@ -77,8 +98,40 @@ function childProc() {
     startWorker(configObject)
 }
 
-if (cluster.isPrimary) {
-    masterProc();
-} else {
-    childProc()
+function mergeENV(config) {
+    const { REDIS_URL, PORT, TLS_PORT, CERT_PATH, KEY_PATH } = process.env;
+    if (REDIS_URL) {
+        config.redis = {
+            url: REDIS_URL,
+            is_cluster: false,
+        }
+    }
+    if (PORT) {
+        config.port = Number(PORT);
+    }
+    if (TLS_PORT && CERT_PATH && KEY_PATH) {
+        config.tls = {
+            port: Number(TLS_PORT),
+            cert: CERT_PATH,
+            key: KEY_PATH,
+        }
+    }
+}
+
+function setupWorker(worker) {
+    let timer = null;
+    let missedPing = 0;
+    timer = setInterval(() => {
+        missedPing++
+        worker.send(JSON.stringify({ action: 'ping' }));
+        if(missedPing > 5 ){
+            process.kill(worker.process.pid);
+            clearInterval(timer);
+        }
+    }, 5000);
+    worker.on('message', (msg) => {
+        if (msg === 'pong') {
+            missedPing = 0;
+        }
+    })
 }
