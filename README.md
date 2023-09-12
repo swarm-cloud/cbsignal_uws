@@ -37,3 +37,8 @@ npm install
 npm run start
 ```
 
+### Get real-time information of signal service
+```
+GET /info
+```
+

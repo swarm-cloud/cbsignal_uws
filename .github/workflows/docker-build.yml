@@ -8,6 +8,7 @@ on:
             - .gitignore
             - .github
             - LICENSE
+            - package.json
 jobs:
     Docker-Build-Push:
         runs-on: ubuntu-latest

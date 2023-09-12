@@ -1,8 +1,9 @@
 {
   "name": "cbsignal_uws",
-  "version": "4.6.0",
+  "version": "4.6.1",
   "description": "SwarmCloud signaling server using uWebSockets.js",
   "main": "index.js",
+  "bin": "index.js",
   "scripts": {
     "start": "node index.js",
     "start_dev": "WORKERS=1 node index.js -c config/config_dev.yaml & WORKERS=1 node index.js -c config/config_dev2.yaml & WORKERS=1 node index.js -c config/config_dev3.yaml",
@@ -13,8 +14,14 @@
     "url": "git+https://github.com/swarm-cloud/cbsignal_uws.git"
   },
   "keywords": [
-    "cdnbye"
+    "cdnbye", "signal", "p2p"
   ],
+  "pkg": {
+    "targets": [
+      "node18-linux-arm64"
+    ],
+    "outputPath": "dist"
+  },
   "author": "cdnbye",
   "license": "ISC",
   "bugs": {
