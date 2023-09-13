@@ -17,9 +17,8 @@ const transportArr = [
 ];
 
 let numCPUs = require("os").availableParallelism();
-if (numCPUs > 2) {
-    numCPUs --;
-}
+numCPUs --;
+
 if (process.env.WORKERS) {
     numCPUs = Number(process.env.WORKERS);
 }
