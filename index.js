@@ -17,11 +17,6 @@ const transportArr = [
 ];
 
 let numCPUs = require("os").availableParallelism();
-numCPUs --;
-
-if (process.env.WORKERS) {
-    numCPUs = Number(process.env.WORKERS);
-}
 
 const program = new Command();
 program
@@ -34,22 +29,6 @@ const options = program.opts();
 const configObject = YAML.load(options.config);
 mergeENV(configObject);
 cluster.schedulingPolicy = cluster.SCHED_RR;
-if (configObject.log?.writers === 'file') {
-    const { logger_dir, log_rotate_size, log_rotate_date } = configObject.log;
-    const transport = new winston.transports.DailyRotateFile({
-        filename: `${logger_dir}/master-%DATE%.log`,
-        datePattern: 'YY-MM-DD',
-        zippedArchive: true,
-        maxSize: `${log_rotate_size}m`,
-        maxFiles: `${log_rotate_date}d`,
-        createSymlink: true,
-        symlinkName: 'master.log',
-        format: format.combine(
-            ...logFormat.commonFormat,
-        ),
-    });
-    transportArr.push(transport);
-}
 
 const logger = createLogger({
     level: configObject.log?.logger_level.toLowerCase() ?? 'warn',
@@ -64,6 +43,11 @@ if (cluster.isPrimary) {
 
 function masterProc() {
     logger.warn(`master ${process.pid} is running, numCPUs ${numCPUs}`);
+    if (process.env.WORKERS) {
+        numCPUs = Number(process.env.WORKERS);
+    } else {
+        numCPUs --;
+    }
     if (numCPUs <= 1 || !configObject.redis) {
         // if (true) {
         // do not start worker thread and use redis
