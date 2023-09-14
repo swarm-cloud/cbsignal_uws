@@ -29,6 +29,23 @@ const options = program.opts();
 const configObject = YAML.load(options.config);
 mergeENV(configObject);
 cluster.schedulingPolicy = cluster.SCHED_RR;
+if (configObject.log?.writers === 'file') {
+    const { logger_dir, log_rotate_size, log_rotate_date } = configObject.log;
+    const transport = new winston.transports.DailyRotateFile({
+        filename: `master.log`,
+        dirname: logger_dir,
+        datePattern: 'YY-MM-DD',
+        zippedArchive: true,
+        maxSize: `${log_rotate_size}m`,
+        maxFiles: `${log_rotate_date}d`,
+        createSymlink: true,
+        symlinkName: 'master.log',
+        format: format.combine(
+            ...logFormat.commonFormat,
+        ),
+    });
+    transportArr.push(transport);
+}
 
 const logger = createLogger({
     level: configObject.log?.logger_level.toLowerCase() ?? 'warn',
