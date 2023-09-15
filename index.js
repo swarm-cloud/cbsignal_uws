@@ -33,11 +33,11 @@ if (configObject.log?.writers === 'file') {
     const { logger_dir, log_rotate_size, log_rotate_date } = configObject.log;
     const transport = new winston.transports.DailyRotateFile({
         filename: `master.log`,
-        dirname: logger_dir,
+        dirname: logger_dir || 'log',
         datePattern: 'YY-MM-DD',
         zippedArchive: true,
-        maxSize: `${log_rotate_size}m`,
-        maxFiles: `${log_rotate_date}d`,
+        maxSize: `${log_rotate_size || 1}m`,
+        maxFiles: `${log_rotate_date || 1}d`,
         createSymlink: true,
         symlinkName: 'master.log',
         format: format.combine(
