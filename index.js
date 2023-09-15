@@ -119,19 +119,41 @@ function mergeENV(config) {
 }
 
 function setupWorker(worker) {
+    worker.connections = 0;
     let timer = null;
     let missedPing = 0;
     timer = setInterval(() => {
         missedPing++
-        worker.send(JSON.stringify({ action: 'ping' }));
+        worker.send(JSON.stringify({
+            action: 'ping',
+            connections: getConnections(),
+        }));
         if(missedPing > 5 ){
             process.kill(worker.process.pid);
             clearInterval(timer);
         }
     }, 5000);
+    worker.on('exit', (code, signal) => {
+        clearInterval(timer);
+    })
     worker.on('message', (msg) => {
-        if (msg === 'pong') {
-            missedPing = 0;
+        msg = JSON.parse(msg);
+        switch (msg.action) {
+            case 'pong':
+                missedPing = 0;
+                worker.connections = msg.connections;
+                break
+            default:
+                console.warn(`unknown action ${msg.action}`);
         }
     })
+}
+
+function getConnections() {
+    let sum = 0;
+    const workers = Object.values(cluster.workers);
+    for (const worker of workers) {
+        sum += worker.connections;
+    }
+    return sum
 }
