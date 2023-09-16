@@ -127,6 +127,7 @@ function setupWorker(worker) {
         worker.send(JSON.stringify({
             action: 'ping',
             connections: getConnections(),
+            workers: Object.values(cluster.workers).length,
         }));
         if(missedPing > 5 ){
             process.kill(worker.process.pid);
