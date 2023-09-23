@@ -56,6 +56,10 @@ if (cluster.isPrimary) {
     masterProc();
 } else {
     childProc()
+    process.on('uncaughtException', err => {
+        logger.error('master caught exception: ' + err)
+        logger.error(err.stack)
+    });
 }
 
 function masterProc() {
