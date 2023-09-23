@@ -25,7 +25,7 @@ You can enable SSL also, make a directory called "cert", then put your cert file
 sudo docker run --name cbsignal_uws \
 -e REDIS_URL=redis://127.0.0.1:6379 \
 -e TLS_PORT=443 -e CERT_PATH=cert/fullchain.cer -e KEY_PATH=cert/cert.key \
--v "$(pwd)"/cert:/cbsignal_uws/cert \
+-v "$(pwd)"/cert:/cbsignal_uws/cert:ro \
 --net host --restart=unless-stopped -d cdnbye/cbsignal_uws:latest
 ```
 
