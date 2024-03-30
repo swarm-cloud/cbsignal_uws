@@ -36,4 +36,4 @@ jobs:
                 with:
                     push: true
                     platforms: linux/amd64
-                    tags: cdnbye/cbsignal_uws:4.6.7
+                    tags: cdnbye/cbsignal_uws:4.6.8
