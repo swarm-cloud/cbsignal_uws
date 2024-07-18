@@ -1,6 +1,6 @@
 {
   "name": "cbsignal_uws",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "description": "SwarmCloud signaling server using uWebSockets.js",
   "main": "index.js",
   "bin": "index.js",
