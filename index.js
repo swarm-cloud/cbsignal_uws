@@ -1,4 +1,5 @@
-const cluster = require('cluster');
+const { Worker, isMainThread, threadId, parentPort, setEnvironmentData } = require('worker_threads');
+const { App, SSLApp } = require("uWebSockets.js");
 const YAML = require('yamljs');
 const pkg = require('./package.json');
 const { Command } = require('commander');
@@ -28,7 +29,7 @@ program.parse(process.argv);
 const options = program.opts();
 const configObject = YAML.load(options.config);
 mergeENV(configObject);
-cluster.schedulingPolicy = cluster.SCHED_RR;
+// cluster.schedulingPolicy = cluster.SCHED_RR;
 if (configObject.log?.writers === 'file') {
     const { logger_dir, log_rotate_size, log_rotate_date } = configObject.log;
     const transport = new winston.transports.DailyRotateFile({
@@ -52,7 +53,7 @@ const logger = createLogger({
     transports: transportArr,
 });
 
-if (cluster.isPrimary) {
+if (isMainThread) {
     masterProc();
 } else {
     childProc()
@@ -70,36 +71,71 @@ function masterProc() {
         numCPUs = 1;
     }
     if (numCPUs <= 1 || !configObject.redis) {
-        // if (true) {
-        // do not start worker thread and use redis
         startWorker(configObject)
     } else {
-        for (let i = 0; i < numCPUs; i++) {
-            logger.info(`forking process number ${i}...`);
-            setupWorker(cluster.fork());
+        const acceptorApps = [];
+        const { port, tls } = configObject;
+        const ports = port ? (Array.isArray(port) ? port : [port]) : [];
+        const sslPorts = tls ? (Array.isArray(tls) ? tls : [tls]) : [];
+        for (let port of ports) {
+            const acceptorApp = App({}).listen(port, (token) => {
+                if (!token) {
+                    logger.error(`Failed to listen to port ${port} from thread ${threadId}`);
+                } else {
+                    logger.warn(`listening to http ${port}`)
+                }
+            });
+            acceptorApps.push(acceptorApp);
         }
-        cluster.on("exit", (worker, code, signal) => {
-            logger.warn(`worker ${worker.process.pid} died, fork another worker`);
-            setTimeout(() => {
-                setupWorker(cluster.fork());
-            }, 5000)
-        });
-        // cluster.on('online', () => {
-        //     logger.info(`Worker is online`)
-        //     const workers = Object.values(cluster.workers);
-        //     const workerPids = workers.map(worker => worker.process.pid);
-        //     for (const worker of workers) {
-        //         worker.send(JSON.stringify({
-        //             action: 'pids',
-        //             data: workerPids,
-        //         }));
-        //     }
-        // })
+
+        for (let item of sslPorts) {
+            if (!item.key || !item.cert) continue;
+            const acceptorApp = SSLApp({
+                key_file_name: item.key,
+                cert_file_name: item.cert,
+            }).listen(item.port, (token) => {
+                if (!token) {
+                    logger.error(`Failed to listen to port ${item.port} from thread ${threadId}`);
+                } else {
+                    logger.warn(`listening to https ${item.port}`)
+                }
+            });
+            acceptorApps.push(acceptorApp);
+        }
+
+        /* Main thread loops over all CPUs */
+        /* In this case we only spawn two (hardcoded) */
+        setEnvironmentData('workers', numCPUs);
+        for (let i = 0; i < numCPUs; i++) {
+            /* Spawn a new thread running this source file */
+            spawnWorker(acceptorApps);
+        }
     }
 }
 
-function childProc() {
-    startWorker(configObject)
+function spawnWorker(acceptorApps) {
+    const worker = new Worker(__filename);
+    worker.on("message", (workerAppDescriptor) => {
+        acceptorApps.forEach(acceptorApp => {
+            acceptorApp.addChildAppDescriptor(workerAppDescriptor);
+        });
+    });
+    worker.on("exit", (exitCode) => {
+        if (exitCode !== 0) {
+            logger.warn(`worker ${worker.threadId} died, spawn another worker`);
+            setTimeout(() => {
+                spawnWorker(acceptorApps);
+            }, 5000)
+        }
+    });
+}
+
+async function childProc() {
+    const servers = await startWorker(configObject);
+    servers.forEach(server => {
+        parentPort.postMessage(server.app.getDescriptor());
+    })
+
 }
 
 function mergeENV(config) {
@@ -120,45 +156,4 @@ function mergeENV(config) {
             key: KEY_PATH,
         }
     }
-}
-
-function setupWorker(worker) {
-    worker.connections = 0;
-    let timer = null;
-    let missedPing = 0;
-    timer = setInterval(() => {
-        missedPing++
-        worker.send(JSON.stringify({
-            action: 'ping',
-            connections: getConnections(),
-            workers: Object.values(cluster.workers).length,
-        }));
-        if(missedPing > 5 ){
-            process.kill(worker.process.pid);
-            clearInterval(timer);
-        }
-    }, 5000);
-    worker.on('exit', (code, signal) => {
-        clearInterval(timer);
-    })
-    worker.on('message', (msg) => {
-        msg = JSON.parse(msg);
-        switch (msg.action) {
-            case 'pong':
-                missedPing = 0;
-                worker.connections = msg.connections;
-                break
-            default:
-                console.warn(`unknown action ${msg.action}`);
-        }
-    })
-}
-
-function getConnections() {
-    let sum = 0;
-    const workers = Object.values(cluster.workers);
-    for (const worker of workers) {
-        sum += worker.connections;
-    }
-    return sum
 }

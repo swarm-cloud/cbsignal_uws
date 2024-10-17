@@ -1,18 +1,19 @@
 
 log:
   writers: stdout              # Output destination —— file and stdout
-  logger_level: WARN           # Log level: DEBUG, INFO, WARN, ERROR, FATAL
+  logger_level: DEBUG           # Log level: DEBUG, INFO, WARN, ERROR, FATAL
   logger_dir: log              # Log file directory
   log_rotate_date: 1           # Log rotate date
   log_rotate_size: 1           # Log rotate size
 
 port:
   - 80
+#  - 801
 
 #tls:
 #  - port: 443
-#    cert: fullchain.cer
-#    key: cdnbye.com.key
+#    cert: cert/signaler.pem
+#    key: cert/signaler.key
 
 #redis:
 #  host: 127.0.0.1
@@ -28,6 +29,12 @@ port:
 ratelimit:
   enable: false
   max_rate: 400                # max requests per second
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  dbname: 0
+  is_cluster: false
 
 stats:
   enable: true

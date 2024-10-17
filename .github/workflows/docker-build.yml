@@ -1,8 +1,8 @@
 name: Docker image buildx and push
 on:
     push:
-        branches:
-            - main
+#        branches:
+#            - main
         paths-ignore:
             - README.md
             - .gitignore
@@ -36,4 +36,4 @@ jobs:
                     push: true
                     platforms: linux/amd64
 #                    tags: cdnbye/cbsignal_uws:latest
-                    tags: cdnbye/cbsignal_uws:5.1.0
+                    tags: cdnbye/cbsignal_uws:5.2.0
