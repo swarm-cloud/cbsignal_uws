@@ -74,6 +74,7 @@ function masterProc() {
         startWorker(configObject)
     } else {
         const acceptorApps = [];
+        const acceptorAppsSSL = [];
         const connections = {};
         const { port, tls } = configObject;
         const ports = port ? (Array.isArray(port) ? port : [port]) : [];
@@ -101,7 +102,7 @@ function masterProc() {
                     logger.warn(`listening to https ${item.port}`)
                 }
             });
-            acceptorApps.push(acceptorApp);
+            acceptorAppsSSL.push(acceptorApp);
         }
 
         /* Main thread loops over all CPUs */
@@ -110,19 +111,23 @@ function masterProc() {
         const bc = new BroadcastChannel('connections');
         for (let i = 0; i < numCPUs; i++) {
             /* Spawn a new thread running this source file */
-            spawnWorker(acceptorApps, connections, bc);
+            spawnWorker(acceptorApps, acceptorAppsSSL, connections, bc);
         }
     }
 }
 
-function spawnWorker(acceptorApps, connections, bc) {
+function spawnWorker(acceptorApps, acceptorAppsSSL, connections, bc) {
     const worker = new Worker(__filename);
     worker.on("message", msg => {
         if (msg.descriptor) {
             acceptorApps.forEach(acceptorApp => {
                 acceptorApp.addChildAppDescriptor(msg.descriptor);
             });
-        } else if(Number.isInteger(msg.connections)) {
+        } else if (msg.descriptorSSL) {
+            acceptorAppsSSL.forEach(acceptorApp => {
+                acceptorApp.addChildAppDescriptor(msg.descriptor);
+            });
+        } else if (Number.isInteger(msg.connections)) {
             connections[worker.threadId] = msg.connections;
             let total = 0;
             Object.values(connections).forEach(num => {
@@ -137,7 +142,7 @@ function spawnWorker(acceptorApps, connections, bc) {
         if (exitCode !== 0) {
             logger.warn(`worker ${worker.threadId} died, spawn another worker`);
             setTimeout(() => {
-                spawnWorker(acceptorApps, connections, bc);
+                spawnWorker(acceptorApps, acceptorAppsSSL, connections, bc);
             }, 5000)
         }
     });
@@ -146,9 +151,15 @@ function spawnWorker(acceptorApps, connections, bc) {
 async function childProc() {
     const servers = await startWorker(configObject);
     servers.forEach(server => {
-        parentPort.postMessage({
-            descriptor: server.app.getDescriptor()
-        });
+        if (server.isSSL) {
+            parentPort.postMessage({
+                descriptorSSL: server.app.getDescriptor()
+            });
+        } else {
+            parentPort.postMessage({
+                descriptor: server.app.getDescriptor()
+            });
+        }
     })
 
 }

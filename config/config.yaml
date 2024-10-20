@@ -10,10 +10,10 @@ port:
   - 80
 #  - 801
 
-#tls:
-#  - port: 443
-#    cert: cert/signaler.pem
-#    key: cert/signaler.key
+tls:
+  - port: 443
+    cert: cert/signaler.pem
+    key: cert/signaler.key
 
 #redis:
 #  host: 127.0.0.1
