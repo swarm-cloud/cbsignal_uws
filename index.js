@@ -1,4 +1,4 @@
-const { Worker, isMainThread, threadId, parentPort, setEnvironmentData } = require('worker_threads');
+const { Worker, isMainThread, threadId, parentPort, setEnvironmentData, getEnvironmentData} = require('worker_threads');
 const { App, SSLApp } = require("uWebSockets.js");
 const YAML = require('yamljs');
 const pkg = require('./package.json');
@@ -67,13 +67,14 @@ function masterProc() {
     logger.warn(`master ${process.pid} is running, numCPUs ${numCPUs}`);
     if (process.env.WORKERS) {
         numCPUs = Number(process.env.WORKERS);
-    } else if (numCPUs === 2) {
-        numCPUs = 1;
+    } else {
+        numCPUs -= 1;
     }
     if (numCPUs <= 1 || !configObject.redis) {
         startWorker(configObject)
     } else {
         const acceptorApps = [];
+        const connections = {};
         const { port, tls } = configObject;
         const ports = port ? (Array.isArray(port) ? port : [port]) : [];
         const sslPorts = tls ? (Array.isArray(tls) ? tls : [tls]) : [];
@@ -106,25 +107,37 @@ function masterProc() {
         /* Main thread loops over all CPUs */
         /* In this case we only spawn two (hardcoded) */
         setEnvironmentData('workers', numCPUs);
+        const bc = new BroadcastChannel('connections');
         for (let i = 0; i < numCPUs; i++) {
             /* Spawn a new thread running this source file */
-            spawnWorker(acceptorApps);
+            spawnWorker(acceptorApps, connections, bc);
         }
     }
 }
 
-function spawnWorker(acceptorApps) {
+function spawnWorker(acceptorApps, connections, bc) {
     const worker = new Worker(__filename);
-    worker.on("message", (workerAppDescriptor) => {
-        acceptorApps.forEach(acceptorApp => {
-            acceptorApp.addChildAppDescriptor(workerAppDescriptor);
-        });
+    worker.on("message", msg => {
+        if (msg.descriptor) {
+            acceptorApps.forEach(acceptorApp => {
+                acceptorApp.addChildAppDescriptor(msg.descriptor);
+            });
+        } else if(Number.isInteger(msg.connections)) {
+            connections[worker.threadId] = msg.connections;
+            let total = 0;
+            Object.values(connections).forEach(num => {
+                total += num;
+            })
+            bc.postMessage(total);
+            setEnvironmentData('connections', total);
+        }
+
     });
     worker.on("exit", (exitCode) => {
         if (exitCode !== 0) {
             logger.warn(`worker ${worker.threadId} died, spawn another worker`);
             setTimeout(() => {
-                spawnWorker(acceptorApps);
+                spawnWorker(acceptorApps, connections, bc);
             }, 5000)
         }
     });
@@ -133,7 +146,9 @@ function spawnWorker(acceptorApps) {
 async function childProc() {
     const servers = await startWorker(configObject);
     servers.forEach(server => {
-        parentPort.postMessage(server.app.getDescriptor());
+        parentPort.postMessage({
+            descriptor: server.app.getDescriptor()
+        });
     })
 
 }
