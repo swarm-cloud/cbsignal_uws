@@ -33,6 +33,9 @@ stats:
   enable: true
 #  token: 123456           # Custom token for requesting stats info
 
+compact:
+  enable: true
+
 compression:
   enable: false
 

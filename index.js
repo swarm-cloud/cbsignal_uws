@@ -66,8 +66,8 @@ function masterProc() {
     logger.warn(`master ${process.pid} is running, numCPUs ${numCPUs}`);
     if (process.env.WORKERS) {
         numCPUs = Number(process.env.WORKERS);
-    } else if (numCPUs === 2) {
-        numCPUs = 1;
+    } else {
+        numCPUs--;
     }
     if (numCPUs <= 1 || !configObject.redis) {
         // if (true) {
