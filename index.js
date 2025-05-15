@@ -1,5 +1,5 @@
 const cluster = require('cluster');
-const YAML = require('yamljs');
+const ConfigLoader = require('./lib/utils/config-loader');
 const pkg = require('./package.json');
 const { Command } = require('commander');
 const { startWorker } = require('./lib/worker');
@@ -26,7 +26,13 @@ program
     .option('-c, --config [p]', 'The yaml file for config', 'config/config.yaml');
 program.parse(process.argv);
 const options = program.opts();
-const configObject = YAML.load(options.config);
+if (process.env.SIGNAL_CONFIG_YAML) {
+    options.config = process.env.SIGNAL_CONFIG_YAML;
+}
+const configLoader = new ConfigLoader()
+    .loadFromYaml(options.config)
+    .loadFromEnv('SIGNAL_');
+const configObject = configLoader.config;
 mergeENV(configObject);
 cluster.schedulingPolicy = cluster.SCHED_RR;
 if (configObject.log?.writers === 'file') {
