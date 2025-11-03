@@ -39,6 +39,10 @@ compact:
 compression:
   enable: false
 
+node:
+  msg_consume_interval: 60
+  max_pipe_length: 800
+
 
 
 
