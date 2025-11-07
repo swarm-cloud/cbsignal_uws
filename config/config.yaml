@@ -1,7 +1,7 @@
 
 log:
   writers: stdout              # Output destination —— file and stdout
-  logger_level: WARN           # Log level: DEBUG, INFO, WARN, ERROR, FATAL
+  logger_level: INFO           # Log level: DEBUG, INFO, WARN, ERROR, FATAL
   logger_dir: log              # Log file directory
   log_rotate_date: 1           # Log rotate date
   log_rotate_size: 1           # Log rotate size
@@ -15,6 +15,7 @@ port:
 #    key: cdnbye.com.key
 
 #redis:
+#  enable: true
 #  host: 127.0.0.1
 #  port: 6379
 #  dbname: 0
