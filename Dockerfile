@@ -7,7 +7,5 @@ WORKDIR /cbsignal_uws
 COPY . /cbsignal_uws/
 RUN yarn install
 
-ENV NODE_OPTIONS="--expose-gc"
-
-CMD [ "node", "index.js", "config.yaml"]
+CMD [ "node", "--expose-gc", "index.js", "config.yaml"]
 
