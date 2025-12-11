@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:24-slim
 
 #RUN npm install pm2 -g
 WORKDIR /cbsignal_uws
